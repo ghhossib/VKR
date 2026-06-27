@@ -1,0 +1,43 @@
+﻿{% load static %}
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>{{ page_title }} - ВКР: Каршеринг в городе Салехард</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{% static 'css/style.css' %}">
+</head>
+<body class="auth-page">
+  <main class="auth-shell">
+    <a href="{% url 'admin_cars_list' %}" class="auth-back">← К управлению автопарком</a>
+    <section class="auth-card admin-form-card">
+      <h1>{{ page_title }}</h1>
+      <form method="post" enctype="multipart/form-data" class="auth-form">
+        {% csrf_token %}
+        {{ form.non_field_errors }}
+        {% for field in form %}
+          {% if field.name == "image_file" %}
+            <div class="admin-field">
+              <label class="admin-label">{{ field.label }}</label>
+              {{ field }}
+              {% if car and car.display_image %}
+                <img class="admin-form-preview" src="{{ car.display_image }}" alt="{{ car.model_name }}">
+              {% endif %}
+            </div>
+          {% elif field.name == "is_active" %}
+            <label class="admin-checkbox-row">{{ field }} <span>{{ field.label }}</span></label>
+          {% else %}
+            <label class="admin-field">{{ field.label }} {{ field }}</label>
+          {% endif %}
+          {{ field.errors }}
+        {% endfor %}
+        <button type="submit" class="btn btn-red">Сохранить</button>
+      </form>
+    </section>
+  </main>
+</body>
+</html>
+

@@ -1,0 +1,86 @@
+﻿{% load static %}
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>{{ car.model_name }} - ВКР: Каршеринг в городе Салехард</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{% static 'css/style.css' %}">
+</head>
+<body>
+  <main class="car-page">
+    <div class="container">
+      <div class="bookings-head">
+        <a href="{% url 'landing' %}#showroom" class="auth-back">← К списку автомобилей</a>
+        {% if request.user.is_authenticated %}
+          <a href="{% url 'my_bookings' %}" class="btn btn-ghost">Мои бронирования</a>
+        {% else %}
+          <a href="{% url 'login' %}?next={% url 'car_detail' car.id %}" class="btn btn-ghost">Войти</a>
+        {% endif %}
+      </div>
+
+      <section class="car-detail-card">
+        <img
+          src="{{ car.display_image|default:'https://images.unsplash.com/photo-1614162692292-7ac56d7f7f1e?auto=format&fit=crop&w=1400&q=80' }}"
+          alt="{{ car.model_name }}"
+          loading="lazy"
+          decoding="async"
+        >
+        <div class="car-detail-body">
+          <span class="chip">{{ car.get_car_class_display }}</span>
+          <h1>{{ car.model_name }}</h1>
+          <p class="specs">{{ car.year }} • {{ car.get_transmission_display }} • {{ car.seats }} мест</p>
+          <p>{{ car.description|default:'Премиальный автомобиль для города, встреч и поездок за пределы мегаполиса.' }}</p>
+
+          <div class="car-detail-booking">
+            <h3>Оформление бронирования</h3>
+            {% if request.user.is_authenticated %}
+              <form method="post" class="auth-form compact-form">
+                {% csrf_token %}
+                {{ form.non_field_errors }}
+                <div class="mode-switch" role="tablist" aria-label="Режим бронирования">
+                  {% for value, label in form.mode.field.choices %}
+                    <label class="mode-tab">
+                      <input type="radio" name="mode" value="{{ value }}" {% if form.mode.value == value or forloop.first and not form.mode.value %}checked{% endif %}>
+                      <span>{{ label }}</span>
+                    </label>
+                  {% endfor %}
+                </div>
+                <label class="mode-field mode-quick">Длительность {{ form.quick_duration }}</label>
+                <label class="mode-field mode-planned">Готовые слоты {{ form.slot }}</label>
+                <button type="submit" class="btn btn-red">Подтвердить бронирование</button>
+              </form>
+            {% else %}
+              <p>Для бронирования войдите в аккаунт.</p>
+              <a href="{% url 'login' %}?next={% url 'car_detail' car.id %}" class="btn btn-red">Войти и забронировать</a>
+            {% endif %}
+          </div>
+
+          <div class="car-detail-footer">
+            <strong>от {{ car.price_per_hour }} ₽/час</strong>
+          </div>
+        </div>
+      </section>
+    </div>
+  </main>
+  <script>
+    const modeInputs = document.querySelectorAll('.mode-switch input[name="mode"]');
+    const quickField = document.querySelector('.mode-quick');
+    const plannedField = document.querySelector('.mode-planned');
+
+    function syncMode() {
+      const selected = document.querySelector('input[name="mode"]:checked')?.value;
+      if (!quickField || !plannedField) return;
+      quickField.style.display = selected === 'quick' ? '' : 'none';
+      plannedField.style.display = selected === 'planned' ? '' : 'none';
+    }
+
+    modeInputs.forEach((input) => input.addEventListener('change', syncMode));
+    syncMode();
+  </script>
+</body>
+</html>
+

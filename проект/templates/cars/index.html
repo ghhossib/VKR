@@ -1,0 +1,213 @@
+﻿{% load static %}
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ВКР: Каршеринг в городе Салехард</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{% static 'css/style.css' %}">
+</head>
+<body>
+<header class="header">
+  <div class="container header-inner">
+    <a href="{% url 'landing' %}" class="logo">ВКР: CARSHARING SALEKHARD</a>
+    <nav class="nav">
+      <a href="#showroom">Автомобили</a>
+      <a href="#how">Как это работает</a>
+      <a href="#pricing">Тарифы</a>
+      <a href="#business">Бизнес</a>
+      <a href="#footer">Контакты</a>
+    </nav>
+    <div class="header-actions">
+      {% if request.user.is_authenticated %}
+        <span class="link">Здравствуйте! {{ request.user.username }}</span>
+        {% if request.user.is_staff %}
+          <a href="{% url 'admin_cars_list' %}" class="link">Панель управления</a>
+        {% endif %}
+        <a href="{% url 'my_bookings' %}" class="link">Мои бронирования</a>
+        <form action="{% url 'logout' %}" method="post" class="inline-form">
+          {% csrf_token %}
+          <button type="submit" class="btn btn-red">Выйти</button>
+        </form>
+      {% else %}
+        <a href="{% url 'login' %}" class="link">Войти</a>
+        <a href="{% url 'register' %}" class="btn btn-red">Регистрация</a>
+      {% endif %}
+    </div>
+  </div>
+</header>
+
+<section class="hero">
+  <div class="overlay"></div>
+  <div class="container hero-content">
+    <p class="eyebrow">ВЫПУСКНАЯ КВАЛИФИКАЦИОННАЯ РАБОТА</p>
+    <h1>Каршеринг в городе Салехард.<br>Демонстрационный веб-сервис.</h1>
+    <p class="subtitle">Проект ВКР, демонстрирующий цифровой сервис бронирования автомобилей для жителей и гостей города Салехард.</p>
+    <div class="hero-cta">
+      <a href="#showroom" class="btn btn-red">Выбрать автомобиль</a>
+      <a href="#pricing" class="btn btn-ghost">Смотреть тарифы</a>
+    </div>
+  </div>
+</section>
+
+
+
+<section class="section light">
+  <div class="container">
+    <h2>Каршеринг для города Салехард</h2>
+    <div class="advantages">
+      <article><h3>Быстрое бронирование</h3><p>Пользователь выбирает автомобиль и оформляет бронь онлайн за несколько шагов.</p></article>
+      <article><h3>Учет доступности</h3><p>Сервис контролирует интервалы аренды и не допускает пересекающихся бронирований.</p></article>
+      <article><h3>Прозрачная стоимость</h3><p>Расчет цены выполняется по тарифу за час и длительности выбранного периода.</p></article>
+      <article><h3>Поддержка через чат</h3><p>Клиент и менеджер могут согласовывать детали поездки в чате по бронированию.</p></article>
+    </div>
+  </div>
+</section>
+
+<section class="section dark" id="showroom">
+  <div class="container">
+    <h2>Автомобили рядом с вами</h2>
+    <p class="section-subtitle">Выберите автомобиль под задачу: деловая встреча, городская поездка, выходные или аэропорт.</p>
+    <div class="filters">
+      {% for value, label in classes %}
+        <button type="button" data-filter="{{ value }}" class="filter {% if selected_class == value %}active{% endif %}">{{ label }}</button>
+      {% endfor %}
+    </div>
+    <div class="vehicles">
+      {% for car in cars %}
+        <article class="vehicle-card" data-class="{{ car.car_class }}">
+          <a href="{% url 'car_detail' car.id %}">
+            <img
+              src="{{ car.display_image|default:'https://images.unsplash.com/photo-1614162692292-7ac56d7f7f1e?auto=format&fit=crop&w=1200&q=80' }}"
+              alt="{{ car.model_name }}"
+              loading="lazy"
+              decoding="async"
+            >
+          </a>
+          <div class="vehicle-body">
+            <span class="chip">{{ car.get_car_class_display }}</span>
+            <h3><a href="{% url 'car_detail' car.id %}" class="card-title-link">{{ car.model_name }}</a></h3>
+            <p class="specs">{{ car.year }} • {{ car.get_transmission_display }} • {{ car.seats }} мест</p>
+            <p>{{ car.description|default:'Готов к поездке по городу и деловым задачам.' }}</p>
+            <div class="vehicle-footer">
+              <strong>от {{ car.price_per_hour }} ₽/час</strong>
+              <a href="{% url 'car_detail' car.id %}" class="btn btn-red">Подробнее</a>
+            </div>
+          </div>
+        </article>
+      {% empty %}
+        <p>Автомобили не найдены. Добавьте данные через админ-панель.</p>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+
+<section class="section editorial" id="business">
+  <div class="container editorial-grid">
+    <img src="/static/img/3.avif" alt="Editorial car">
+    <div>
+    <h2>Цифровой сервис в рамках ВКР</h2>
+      <p>Данный сайт разработан как выпускная квалификационная работа по теме «Каршеринг в городе Салехард» и демонстрирует клиентскую часть, API и панель управления бронированиями.</p>
+      <div class="stats">
+        <div><strong>Django</strong><span>backend</span></div>
+        <div><strong>DRF</strong><span>API</span></div>
+        <div><strong>MySQL</strong><span>хранение данных</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="section dark" id="how">
+  <div class="container">
+    <h2>Как работает сервис</h2>
+    <div class="steps">
+      <article><span>01</span><h3>Регистрация и вход</h3><p>Пользователь создает аккаунт и авторизуется в системе.</p></article>
+      <article><span>02</span><h3>Выбор автомобиля</h3><p>На витрине доступны классы авто и карточки с параметрами.</p></article>
+      <article><span>03</span><h3>Создание брони</h3><p>Бронь оформляется в быстром или запланированном режиме.</p></article>
+      <article><span>04</span><h3>Сопровождение заявки</h3><p>Менеджер подтверждает, отменяет или завершает бронирование.</p></article>
+    </div>
+  </div>
+</section>
+
+<section class="section light" id="pricing">
+  <div class="container">
+    <h2>Тарифные категории</h2>
+    <div class="prices">
+      <article><h3>Эконом</h3><p class="price">от 700 ₽/час</p><p>Базовая городская аренда для повседневных поездок.</p></article>
+      <article><h3>Комфорт</h3><p class="price">от 1200 ₽/час</p><p>Повышенный комфорт для рабочих и личных маршрутов.</p></article>
+      <article><h3>Бизнес</h3><p class="price">от 2200 ₽/час</p><p>Класс для деловых поездок и представительских задач.</p></article>
+      <article><h3>SUV</h3><p class="price">от 2500 ₽/час</p><p>Автомобили повышенной проходимости и вместимости.</p></article>
+    </div>
+  </div>
+</section>
+
+<section class="final-cta">
+  <div class="container">
+    <h2>Салехард уже ждет.<br>Выберите автомобиль.</h2>
+    <a href="#showroom" class="btn btn-red">Начать бронирование</a>
+  </div>
+</section>
+
+<footer class="footer" id="footer">
+  <div class="container footer-grid">
+    <div><h4>ВКР: Каршеринг в Салехарде</h4><p>Демонстрационный проект информационной системы.</p></div>
+    <div><h4>Навигация</h4><a href="#showroom">Автомобили</a><a href="#pricing">Тарифы</a><a href="#how">Как это работает</a><a href="#business">Бизнес</a></div>
+    <div>
+      <h4>Аккаунт</h4>
+      {% if request.user.is_authenticated %}
+        <a href="{% url 'my_bookings' %}">Мои бронирования</a>
+      {% else %}
+        <a href="{% url 'login' %}">Войти</a>
+        <a href="{% url 'register' %}">Регистрация</a>
+      {% endif %}
+    </div>
+    <div><h4>Контакты</h4><p>support@carsharing-vkr.ru</p><p>Салехард</p><p>Поддержка сервиса</p></div>
+  </div>
+  <div class="container copy">© 2026 ВКР «Каршеринг в городе Салехард».</div>
+</footer>
+<script>
+  document.querySelectorAll('a[href^="#"]').forEach((anchor) => {
+    anchor.addEventListener("click", (event) => {
+      const href = anchor.getAttribute("href");
+      if (!href || href === "#") return;
+      const target = document.querySelector(href);
+      if (!target) return;
+
+      event.preventDefault();
+      const header = document.querySelector(".header");
+      const headerOffset = header ? header.offsetHeight + 20 : 0;
+      const targetTop = target.getBoundingClientRect().top + window.pageYOffset - headerOffset;
+
+      window.scrollTo({
+        top: targetTop,
+        behavior: "smooth"
+      });
+      history.replaceState(null, "", href);
+    });
+  });
+
+  const filterButtons = document.querySelectorAll(".filter[data-filter]");
+  const vehicleCards = document.querySelectorAll(".vehicle-card[data-class]");
+
+  filterButtons.forEach((button) => {
+    button.addEventListener("click", () => {
+      const selectedFilter = button.dataset.filter;
+
+      filterButtons.forEach((item) => item.classList.remove("active"));
+      button.classList.add("active");
+
+      vehicleCards.forEach((card) => {
+        const cardClass = card.dataset.class;
+        const shouldShow = selectedFilter === "all" || cardClass === selectedFilter;
+        card.style.display = shouldShow ? "" : "none";
+      });
+    });
+  });
+</script>
+</body>
+</html>
+
+

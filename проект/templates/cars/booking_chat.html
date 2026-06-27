@@ -1,0 +1,142 @@
+﻿{% load static %}
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Чат по брони #{{ booking.id }} - ВКР: Каршеринг в городе Салехард</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{% static 'css/style.css' %}">
+</head>
+<body>
+  <main class="bookings-page">
+    <div class="container">
+      <div class="bookings-head">
+        {% if is_manager %}
+          <a href="{% url 'admin_bookings_list' %}" class="auth-back">← К бронированиям</a>
+        {% else %}
+          <a href="{% url 'my_bookings' %}" class="auth-back">← К моим бронированиям</a>
+        {% endif %}
+        <form action="{% url 'logout' %}" method="post">
+          {% csrf_token %}
+          <button type="submit" class="btn btn-ghost">Выйти</button>
+        </form>
+      </div>
+
+      <h1>Чат по брони #{{ booking.id }}</h1>
+      <p>{{ booking.car.model_name }} • {{ booking.start_at|date:"d.m.Y H:i" }} - {{ booking.end_at|date:"d.m.Y H:i" }}</p>
+
+      {% if messages %}
+        <div class="flash-list">
+          {% for message in messages %}
+            <p class="flash-item">{{ message }}</p>
+          {% endfor %}
+        </div>
+      {% endif %}
+
+      <section class="booking-item">
+        <div class="booking-content">
+          <div id="chat-messages" class="bookings-list">
+            {% if chat_messages %}
+              {% for msg in chat_messages %}
+                <article class="booking-item">
+                  <div class="booking-content">
+                    <div class="booking-top">
+                      <h3>{{ msg.author.username }}</h3>
+                      <span>{{ msg.created_at|date:"d.m.Y H:i" }}</span>
+                    </div>
+                    <p>{{ msg.text|linebreaksbr }}</p>
+                  </div>
+                </article>
+              {% endfor %}
+            {% else %}
+              <p id="empty-chat">Пока сообщений нет. Начните диалог.</p>
+            {% endif %}
+          </div>
+
+          {% if chat_page_obj and chat_page_obj.paginator.num_pages > 1 %}
+            <nav class="admin-pagination">
+              {% if chat_page_obj.has_previous %}
+                <a class="btn btn-ghost" href="?page={{ chat_page_obj.previous_page_number }}">Назад</a>
+              {% endif %}
+              <span>Страница {{ chat_page_obj.number }} из {{ chat_page_obj.paginator.num_pages }}</span>
+              {% if chat_page_obj.has_next %}
+                <a class="btn btn-ghost" href="?page={{ chat_page_obj.next_page_number }}">Вперед</a>
+              {% endif %}
+            </nav>
+          {% endif %}
+
+          <form method="post" class="auth-form compact-form">
+            {% csrf_token %}
+            <label for="id_text">Сообщение</label>
+            <textarea id="id_text" name="text" class="auth-input chat-textarea" rows="4" maxlength="2000" required></textarea>
+            <button type="submit" class="btn btn-red">Отправить</button>
+          </form>
+        </div>
+      </section>
+    </div>
+  </main>
+
+  <script>
+    const messagesContainer = document.getElementById("chat-messages");
+    const page = new URLSearchParams(window.location.search).get("page") || "1";
+    const endpoint = "{% url 'booking_chat_messages' booking.id %}?page=" + encodeURIComponent(page);
+
+    function escapeHtml(value) {
+      return value
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;")
+        .replaceAll("'", "&#39;");
+    }
+
+    function renderMessages(items) {
+      if (!items.length) {
+        messagesContainer.innerHTML = '<p id="empty-chat">Пока сообщений нет. Начните диалог.</p>';
+        return;
+      }
+
+      messagesContainer.innerHTML = items.map((msg) => {
+        const safeAuthor = escapeHtml(msg.author || "");
+        const safeDate = escapeHtml(msg.created_at || "");
+        const safeText = escapeHtml(msg.text || "").replaceAll("\n", "<br>");
+
+        return `
+          <article class="booking-item">
+            <div class="booking-content">
+              <div class="booking-top">
+                <h3>${safeAuthor}</h3>
+                <span>${safeDate}</span>
+              </div>
+              <p>${safeText}</p>
+            </div>
+          </article>
+        `;
+      }).join("");
+    }
+
+    async function refreshMessages() {
+      try {
+        const response = await fetch(endpoint, {
+          method: "GET",
+          headers: {"X-Requested-With": "XMLHttpRequest"},
+          cache: "no-store",
+        });
+        if (!response.ok) return;
+
+        const payload = await response.json();
+        renderMessages(payload.messages || []);
+      } catch (error) {
+        // Тихо игнорируем сбой, чтобы не засорять интерфейс при кратких проблемах сети.
+      }
+    }
+
+    refreshMessages();
+    setInterval(refreshMessages, 5000);
+  </script>
+</body>
+</html>
+

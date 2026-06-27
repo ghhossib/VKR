@@ -1,0 +1,83 @@
+﻿{% load static %}
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Мои бронирования - ВКР: Каршеринг в городе Салехард</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{% static 'css/style.css' %}">
+</head>
+<body>
+  <main class="bookings-page">
+    <div class="container">
+      <div class="bookings-head">
+        <a href="{% url 'landing' %}" class="auth-back">← На главную</a>
+        <form action="{% url 'logout' %}" method="post">
+          {% csrf_token %}
+          <button type="submit" class="btn btn-ghost">Выйти</button>
+        </form>
+      </div>
+      <h1>Мои бронирования</h1>
+      {% if messages %}
+        <div class="flash-list">
+          {% for message in messages %}
+            <p class="flash-item">{{ message }}</p>
+          {% endfor %}
+        </div>
+      {% endif %}
+      {% if bookings %}
+        <div class="bookings-list">
+          {% for booking in bookings %}
+            <article class="booking-item">
+              <div class="booking-layout">
+                <img class="booking-image" src="{{ booking.car.display_image|default:'https://images.unsplash.com/photo-1614162692292-7ac56d7f7f1e?auto=format&fit=crop&w=1000&q=80' }}" alt="{{ booking.car.model_name }}">
+                <div class="booking-content">
+                  <div class="booking-top">
+                    <h3>{{ booking.car.model_name }}</h3>
+                    <span class="booking-status booking-status-{{ booking.status }}">{{ booking.get_status_display }}</span>
+                  </div>
+                  <div class="booking-meta">
+                    <div>
+                      <span>Период</span>
+                      <strong>{{ booking.start_at|date:"d.m.Y H:i" }} - {{ booking.end_at|date:"d.m.Y H:i" }}</strong>
+                    </div>
+                    <div>
+                      <span>Создано</span>
+                      <strong>{{ booking.created_at|date:"d.m.Y H:i" }}</strong>
+                    </div>
+                    <div>
+                      <span>Стоимость</span>
+                      <strong class="booking-price">{{ booking.total_price }} ₽</strong>
+                    </div>
+                  </div>
+                  {% if booking.status == "created" or booking.status == "confirmed" %}
+                    <a href="{% url 'booking_chat' booking.id %}" class="btn btn-ghost">Чат с менеджером</a>
+                  {% endif %}
+                  {% if booking.status == "created" or booking.status == "confirmed" %}
+                    <form method="post" action="{% url 'cancel_booking' booking.id %}" class="cancel-form">
+                      {% csrf_token %}
+                      <button type="submit" class="btn btn-ghost cancel-btn">Отменить бронирование</button>
+                    </form>
+                  {% endif %}
+                  {% if booking.status == "canceled" and booking.manager_comment %}
+                    <p class="booking-note"><strong>Причина отмены:</strong> {{ booking.manager_comment }}</p>
+                  {% endif %}
+                </div>
+              </div>
+            </article>
+          {% endfor %}
+        </div>
+      {% else %}
+        <p class="empty-bookings">У вас пока нет бронирований.</p>
+      {% endif %}
+    </div>
+  </main>
+</body>
+</html>
+
+
+
+

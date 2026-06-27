@@ -1,0 +1,81 @@
+﻿{% load static %}
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Управление пользователями - ВКР: Каршеринг в городе Салехард</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{% static 'css/style.css' %}">
+</head>
+<body>
+  <main class="bookings-page">
+    <div class="container">
+      <div class="bookings-head">
+        <a href="{% url 'landing' %}" class="auth-back">← На главную</a>
+        <div class="admin-actions-top">
+          <a href="{% url 'admin_cars_list' %}" class="btn btn-ghost">Машины</a>
+          <a href="{% url 'admin_bookings_list' %}" class="btn btn-ghost">Бронирования</a>
+          <a href="{% url 'admin_user_create' %}" class="btn btn-red">Добавить пользователя</a>
+          <form action="{% url 'logout' %}" method="post">
+            {% csrf_token %}
+            <button type="submit" class="btn btn-ghost">Выйти</button>
+          </form>
+        </div>
+      </div>
+      <h1>Управление пользователями</h1>
+      {% if messages %}
+        <div class="flash-list">
+          {% for message in messages %}
+            <p class="flash-item">{{ message }}</p>
+          {% endfor %}
+        </div>
+      {% endif %}
+
+      <div class="admin-table-wrap">
+        <table class="admin-table">
+          <thead>
+            <tr>
+              <th>Логин</th>
+              <th>Email</th>
+              <th>Роли</th>
+              <th>Статус</th>
+              <th>Действия</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for u in users %}
+              <tr>
+                <td>{{ u.username }}</td>
+                <td>{{ u.email|default:'-' }}</td>
+                <td>
+                  {% if u.is_superuser %}superuser {% endif %}
+                  {% if u.is_staff %}staff{% else %}client{% endif %}
+                </td>
+                <td>{% if u.is_active %}Активен{% else %}Отключен{% endif %}</td>
+                <td class="admin-row-actions">
+                  <a href="{% url 'admin_user_edit' u.id %}" class="btn btn-ghost">Изменить</a>
+                  <a href="{% url 'admin_user_password' u.id %}" class="btn btn-ghost">Пароль</a>
+                  {% if u.id != request.user.id %}
+                    <form method="post" action="{% url 'admin_user_delete' u.id %}" onsubmit="return confirm('Удалить пользователя?');">
+                      {% csrf_token %}
+                      <button type="submit" class="btn btn-ghost cancel-btn">Удалить</button>
+                    </form>
+                  {% endif %}
+                </td>
+              </tr>
+            {% empty %}
+              <tr><td colspan="5">Пользователей нет.</td></tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </main>
+</body>
+</html>
+
+
+

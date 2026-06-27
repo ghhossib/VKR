@@ -1,0 +1,104 @@
+[
+  {
+    "model": "cars.car",
+    "pk": 1,
+    "fields": {
+      "model_name": "Porsche Macan",
+      "car_class": "business",
+      "year": 2024,
+      "transmission": "automatic",
+      "seats": 5,
+      "price_per_hour": "2800.00",
+      "description": "Премиальный SUV для деловых и вечерних поездок.",
+      "image_url": "https://commons.wikimedia.org/wiki/Special:FilePath/2025%20Porsche%20Macan%20Turbo%20%28United%20States%29%20front%20view.jpg",
+      "image_file": "cars/porsche-macan.webp",
+      "is_active": true,
+      "created_at": "2026-01-01T10:00:00Z"
+    }
+  },
+  {
+    "model": "cars.car",
+    "pk": 2,
+    "fields": {
+      "model_name": "BMW X3",
+      "car_class": "suv",
+      "year": 2023,
+      "transmission": "automatic",
+      "seats": 5,
+      "price_per_hour": "2400.00",
+      "description": "Баланс динамики и комфорта для города и трассы.",
+      "image_url": "https://commons.wikimedia.org/wiki/Special:FilePath/BMW%20X3%20xDrive20d%20M%20Sport%20%28G01%29%20front.jpg",
+      "image_file": "cars/bmw-x3.webp",
+      "is_active": true,
+      "created_at": "2026-01-01T10:00:00Z"
+    }
+  },
+  {
+    "model": "cars.car",
+    "pk": 3,
+    "fields": {
+      "model_name": "Mercedes-Benz E-Class",
+      "car_class": "business",
+      "year": 2023,
+      "transmission": "automatic",
+      "seats": 5,
+      "price_per_hour": "2600.00",
+      "description": "Тихий и статусный седан для встреч и аэропорта.",
+      "image_url": "https://commons.wikimedia.org/wiki/Special:FilePath/Mercedes-Benz%20E%20200%20AVANTGARDE%20%284AA-214050C%29%20front.jpg",
+      "image_file": "cars/mercedes-benz-e-class.webp",
+      "is_active": true,
+      "created_at": "2026-01-01T10:00:00Z"
+    }
+  },
+  {
+    "model": "cars.car",
+    "pk": 4,
+    "fields": {
+      "model_name": "Audi A6",
+      "car_class": "comfort",
+      "year": 2022,
+      "transmission": "automatic",
+      "seats": 5,
+      "price_per_hour": "1900.00",
+      "description": "Уверенная динамика и продуманная эргономика.",
+      "image_url": "https://commons.wikimedia.org/wiki/Special:FilePath/Tuned%20Audi%20A6%20SEDAN%20%28C8%29%20front.jpg",
+      "image_file": "cars/audi-a6.webp",
+      "is_active": true,
+      "created_at": "2026-01-01T10:00:00Z"
+    }
+  },
+  {
+    "model": "cars.car",
+    "pk": 5,
+    "fields": {
+      "model_name": "Toyota Camry",
+      "car_class": "comfort",
+      "year": 2022,
+      "transmission": "automatic",
+      "seats": 5,
+      "price_per_hour": "1300.00",
+      "description": "Комфортный городской вариант на каждый день.",
+      "image_url": "https://commons.wikimedia.org/wiki/Special:FilePath/Toyota%20XV70%20Camry%20in%20Central%2C%20Hong%20Kong%20%28Front%29.jpg",
+      "image_file": "cars/toyota-camry.webp",
+      "is_active": true,
+      "created_at": "2026-01-01T10:00:00Z"
+    }
+  },
+  {
+    "model": "cars.car",
+    "pk": 6,
+    "fields": {
+      "model_name": "Volkswagen Polo",
+      "car_class": "economy",
+      "year": 2021,
+      "transmission": "automatic",
+      "seats": 5,
+      "price_per_hour": "800.00",
+      "description": "Экономичный вариант для коротких городских маршрутов.",
+      "image_url": "https://commons.wikimedia.org/wiki/Special:FilePath/Vw-polo-front.png",
+      "image_file": "cars/volkswagen-polo.webp",
+      "is_active": true,
+      "created_at": "2026-01-01T10:00:00Z"
+    }
+  }
+]
